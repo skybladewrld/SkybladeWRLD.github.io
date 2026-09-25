@@ -154,12 +154,11 @@ p { max-width: 62ch; }
 .interest-list article:hover h2 { color: var(--accent); }
 .social-list { border-top: 1px solid var(--line); }
 .social-link, .social-profile { display: grid; grid-template-columns: minmax(100px, .6fr) minmax(0, 1fr) 24px; align-items: center; gap: 24px; padding: 24px 16px; border-bottom: 1px solid var(--line); }
-.social-name { font: 600 1.5rem var(--display); }
-.social-handle { color: var(--muted); font: .875rem/1.7 var(--mono); overflow-wrap: anywhere; }
+.social-name { font: 600 1.625rem var(--display); }
+.social-handle { color: var(--muted); font: .9375rem/1.7 var(--mono); overflow-wrap: anywhere; }
 .social-arrow { color: var(--accent); font-size: 1.5rem; }
 .social-link:hover { background: var(--surface); }
 .social-link:hover .social-name { color: var(--accent); }
-.social-note { display: block; font: .75rem/1.7 'Segoe UI', Arial, sans-serif; margin-top: 4px; }
 @media (max-width: 900px) {
   .site-header { flex-wrap: wrap; gap: 8px; padding: 12px 20px 0; }
   .page-tabs { width: 100%; gap: 0; }

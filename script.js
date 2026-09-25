@@ -68,7 +68,6 @@ function initializeTitle() {
   titleLetters = [...title.querySelectorAll('[data-letter]')];
   requestAnimationFrame(shuffleTitle);
   title.addEventListener('pointerenter', shuffleTitle);
-  title.addEventListener('pointerleave', restoreTitle);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeTitle, { once: true });
 else initializeTitle();
