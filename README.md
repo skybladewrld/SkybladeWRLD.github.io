@@ -11,7 +11,7 @@ Lorenzo’s personal website in plain HTML, CSS, and JavaScript.
 Navigation looks like tabs; each tab is a real page, so links, browser history, and navigation without JavaScript work normally. Each page ends with a next-page button.
 
 ## Editing
-Shared colors, spacing, typography, and layout live in `style.css`. Shared navigation and metadata are written into each HTML file. `script.js` only supports links from the original single-page version.
+Shared colors, spacing, typography, and layout live in `style.css`. Shared navigation and metadata are written into each HTML file. `script.js` preserves old section links, adds a brief decorative title shuffle, and chooses the direction of native page transitions. Reduced-motion preferences disable the effects. Browsers without native page transitions use normal navigation.
 
 The setup photo is resized for the web with embedded metadata removed. The share image is a JPEG version of the same photo. Space Grotesk is hosted locally under the license in `assets/space-grotesk-LICENSE.txt`; there are no external font requests, trackers, or runtime dependencies.
 

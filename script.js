@@ -1,13 +1,75 @@
-// Keep links from the original single-page version working.
-// Regular page navigation works without JavaScript.
-const previousSections = {
-  '#about': 'about.html',
-  '#setup': 'setup.html',
-  '#interests': 'interests.html'
-};
-function followPreviousLink() {
-  const destination = previousSections[window.location.hash];
-  if (destination) window.location.replace(destination);
+// Old section links still reach the right page. Normal links work without JS.
+const oldSections = { '#about': 'about.html', '#setup': 'setup.html', '#interests': 'interests.html' };
+function followOldLink() {
+  if (!['/', '/index.html'].includes(location.pathname)) return;
+  const destination = oldSections[location.hash];
+  if (destination) location.replace(destination);
 }
-followPreviousLink();
-window.addEventListener('hashchange', followPreviousLink);
+followOldLink();
+window.addEventListener('hashchange', followOldLink);
+
+// Registered in the head so the browser knows the slide direction before painting.
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+const pageOrder = ['index.html', 'about.html', 'setup.html', 'interests.html'];
+let title;
+let titleFrame;
+let transitioning = false;
+function setDirection(from, to) {
+  if (!from || !to) return;
+  const indexOf = url => pageOrder.indexOf(new URL(url).pathname.split('/').pop() || 'index.html');
+  const previous = indexOf(from), next = indexOf(to);
+  if (previous >= 0 && next >= 0) document.documentElement.dataset.travel = next < previous ? 'back' : 'forward';
+}
+function restoreTitle() {
+  cancelAnimationFrame(titleFrame);
+  if (title) title.textContent = title.dataset.scramble;
+}
+function shuffleTitle() {
+  if (!title || motionPreference.matches || document.hidden || transitioning) return;
+  restoreTitle();
+  const text = title.dataset.scramble;
+  const started = performance.now();
+  const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  function draw(now) {
+    const progress = Math.min((now - started) / 560, 1);
+    const resolved = Math.floor(progress * text.length);
+    title.textContent = [...text].map((letter, i) => i < resolved ? letter : symbols[(Math.floor(now / 65) + i * 7) % symbols.length]).join('');
+    if (progress < 1) titleFrame = requestAnimationFrame(draw);
+    else restoreTitle();
+  }
+  titleFrame = requestAnimationFrame(draw);
+}
+window.addEventListener('pageswap', event => {
+  restoreTitle();
+  setDirection(location.href, event.activation?.entry?.url);
+  if (motionPreference.matches) event.viewTransition?.skipTransition();
+});
+window.addEventListener('pagereveal', event => {
+  if (!event.viewTransition) return;
+  if (motionPreference.matches) { event.viewTransition.skipTransition(); return; }
+  setDirection(window.navigation?.activation?.from?.url, location.href);
+  transitioning = true;
+  restoreTitle();
+  document.documentElement.setAttribute('data-transitioning', '');
+  event.viewTransition.finished.finally(() => {
+    transitioning = false;
+    // Keep the initial entrance from replaying when the slide finishes.
+    document.documentElement.setAttribute('data-navigated', '');
+    document.documentElement.removeAttribute('data-transitioning');
+    shuffleTitle();
+  }).catch(() => {});
+});
+function initializeTitle() {
+  title = document.querySelector('[data-scramble]');
+  if (!title) return;
+  requestAnimationFrame(shuffleTitle);
+  title.closest('h1').addEventListener('pointerenter', shuffleTitle);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeTitle, { once: true });
+else initializeTitle();
+motionPreference.addEventListener('change', () => {
+  restoreTitle();
+  if (motionPreference.matches) document.documentElement.removeAttribute('data-transitioning');
+});
+document.addEventListener('visibilitychange', restoreTitle);
+window.addEventListener('pagehide', restoreTitle);
