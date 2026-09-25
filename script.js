@@ -1,5 +1,5 @@
 // Old section links still reach the right page. Normal links work without JS.
-const oldSections = { '#about': 'about.html', '#setup': 'setup.html', '#interests': 'interests.html' };
+const oldSections = { '#about': 'about.html', '#setup': 'setup.html', '#interests': 'interests.html', '#socials': 'socials.html' };
 function followOldLink() {
   if (!['/', '/index.html'].includes(location.pathname)) return;
   const destination = oldSections[location.hash];
@@ -10,8 +10,9 @@ window.addEventListener('hashchange', followOldLink);
 
 // Registered in the head so the browser knows the slide direction before painting.
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-const pageOrder = ['index.html', 'about.html', 'setup.html', 'interests.html'];
+const pageOrder = ['index.html', 'about.html', 'setup.html', 'interests.html', 'socials.html'];
 let title;
+let titleLetters = [];
 let titleFrame;
 let transitioning = false;
 function setDirection(from, to) {
@@ -22,7 +23,7 @@ function setDirection(from, to) {
 }
 function restoreTitle() {
   cancelAnimationFrame(titleFrame);
-  if (title) title.textContent = title.dataset.scramble;
+  titleLetters.forEach(letter => { letter.textContent = letter.dataset.letter; });
 }
 function shuffleTitle() {
   if (!title || motionPreference.matches || document.hidden || transitioning) return;
@@ -33,7 +34,9 @@ function shuffleTitle() {
   function draw(now) {
     const progress = Math.min((now - started) / 560, 1);
     const resolved = Math.floor(progress * text.length);
-    title.textContent = [...text].map((letter, i) => i < resolved ? letter : symbols[(Math.floor(now / 65) + i * 7) % symbols.length]).join('');
+    titleLetters.forEach((letter, i) => {
+      letter.textContent = i < resolved ? text[i] : symbols[(Math.floor(now / 65) + i * 7) % symbols.length];
+    });
     if (progress < 1) titleFrame = requestAnimationFrame(draw);
     else restoreTitle();
   }
@@ -62,8 +65,10 @@ window.addEventListener('pagereveal', event => {
 function initializeTitle() {
   title = document.querySelector('[data-scramble]');
   if (!title) return;
+  titleLetters = [...title.querySelectorAll('[data-letter]')];
   requestAnimationFrame(shuffleTitle);
-  title.closest('h1').addEventListener('pointerenter', shuffleTitle);
+  title.addEventListener('pointerenter', shuffleTitle);
+  title.addEventListener('pointerleave', restoreTitle);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeTitle, { once: true });
 else initializeTitle();

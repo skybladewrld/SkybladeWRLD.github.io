@@ -7,6 +7,7 @@ Lorenzo’s personal website in plain HTML, CSS, and JavaScript.
 - `about.html`: a little about Lorenzo and getting into homelabs.
 - `setup.html`: the actual setup photo.
 - `interests.html`: soccer, FPV, and homelab.
+- `socials.html`: links to public profiles.
 
 Navigation looks like tabs; each tab is a real page, so links, browser history, and navigation without JavaScript work normally. Each page ends with a next-page button.
 
